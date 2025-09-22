@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "angular.ng-template",
+    "ms-azuretools.vscode-docker",
+    "Prisma.prisma",
+    "vitest.explorer",
+    "ms-playwright.playwright",
+    "EthanSK.restore-terminals",
+    "esbenp.prettier-vscode"
+  ]
+}

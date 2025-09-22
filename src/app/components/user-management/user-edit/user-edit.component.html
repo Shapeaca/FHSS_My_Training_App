@@ -1,0 +1,83 @@
+<h2 mat-dialog-title>Editing: {{ displayName() }}</h2>
+
+<mat-dialog-content>
+  <div class="info">
+    <p>Full Name: {{ fullName() }}</p>
+    <p>Net ID: {{ user()?.netId }}</p>
+    @if (user()?.accountType !== "NonByu") {
+      <p>BYU ID: {{ user()?.byuId }}</p>
+    }
+    @if (user()?.accountType === "Employee") {
+      <p>Worker ID: {{ user()?.workerId }}</p>
+    }
+    <p>Account Type: {{ user()?.accountType }}</p>
+    <p>Created at: {{ user()?.createdAt | date }}</p>
+    <p>Updated at: {{ user()?.updatedAt | date }}</p>
+    <p>Last Login: {{ (user()?.lastLogin | date) ?? "Never" }}</p>
+  </div>
+  <div class="access">
+    @if (!isEditingAccess()) {
+      @if (user()?.roles?.length) {
+        <p>Roles: {{ user()?.roles?.join(", ") | titlecase }}</p>
+      }
+      @if (user()?.permissions?.length) {
+        <p>Additional Permissions:</p>
+        <p>{{ user()?.permissions?.join(", ") | titlecase }}</p>
+      }
+      <button
+        mat-button
+        [disabled]="blockInteraction()"
+        (click)="isEditingAccess.set(true)"
+      >
+        Manage Access
+      </button>
+    } @else {
+      <mat-form-field>
+        <mat-label>Roles</mat-label>
+        <mat-select [(value)]="user()!.roles" multiple>
+          @for (role of allRoles; track role) {
+            <mat-option [value]="role">{{ role }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Additional Permissions</mat-label>
+        <mat-select [(value)]="user()!.permissions" multiple>
+          @for (permission of allPermissions; track permission) {
+            <mat-option [value]="permission">{{ permission }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button
+        mat-flat-button
+        [disabled]="blockInteraction()"
+        (click)="saveAccess()"
+      >
+        Save
+      </button>
+    }
+  </div>
+  @if (userResource.isLoading()) {
+    <div class="shade">
+      <mat-spinner />
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+    mat-flat-button
+    [disabled]="blockInteraction()"
+    (click)="deleteUser()"
+    class="delete-button"
+  >
+    Delete
+  </button>
+  <button mat-flat-button [mat-dialog-close]="hasMadeUpdate()">Done</button>
+</mat-dialog-actions>
+
+@if (userResource.isLoading()) {
+  <div class="shade">
+    <mat-spinner />
+  </div>
+}

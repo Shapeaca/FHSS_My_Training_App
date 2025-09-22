@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>Create a new user</h2>
+
+<mat-dialog-content>
+  <form (ngSubmit)="req()">
+    <mat-form-field>
+      <mat-label>NetID</mat-label>
+      <input
+        matInput
+        [(ngModel)]="netId"
+        name="netIdInput"
+        id="netIdInput"
+        #netIdInput="ngModel"
+        cdkFocusInitial
+        required
+      /><mat-error>
+        @if (netIdInput.hasError("required")) { Error: NetID is required } @if
+        (netIdInput.hasError('notFound')) { Error: NetID does not exist } @if
+        (netIdInput.hasError('unknown')) { An unknown error occurred } @if
+        (netIdInput.hasError('conflict')) { User already exists }</mat-error
+      >
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-button
+    (click)="req()"
+    [disabled]="isLoading() || !netId()"
+    type="submit"
+  >
+    Create
+  </button>
+</mat-dialog-actions>
+
+@if (isLoading()) {
+<div class="shade">
+  <mat-spinner />
+</div>
+}

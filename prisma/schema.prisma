@@ -1,0 +1,20 @@
+generator client {
+  provider               = "prisma-client"
+  output                 = "./generated"
+  runtime                = "nodejs"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model JwtBlacklist {
+  id  String   @id
+  exp DateTime
+
+  @@index([exp])
+}

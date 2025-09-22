@@ -1,0 +1,29 @@
+{
+  "keepExistingTerminalsOpen": false,
+  "runOnStartup": false,
+  "terminals": [
+    {
+      "splitTerminals": [
+        {
+          "name": "docker",
+          "commands": ["cd development", "docker compose up"]
+        },
+        {
+          "name": "prisma",
+          "commands": ["npm run prisma:studio -- --browser none"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "app",
+          "commands": ["npm run dev"]
+        },
+        {
+          "name": "working"
+        }
+      ]
+    }
+  ]
+}

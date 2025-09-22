@@ -1,0 +1,59 @@
+<fhss-table
+  [config]="tableConfig"
+  [miscParams]="{
+    accountTypes: selectedAccountTypes,
+    createdAt: { after: createdAfter, before: createdBefore },
+  }"
+>
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>Created after:</mat-label>
+    <input
+      [(ngModel)]="createdAfter"
+      matInput
+      [matDatepicker]="pickerOne"
+      [matDatepickerFilter]="forceBefore"
+      placeholder="MM/DD/YYYY"
+    />
+    <mat-datepicker-toggle
+      matIconSuffix
+      [for]="pickerOne"
+    ></mat-datepicker-toggle>
+    @if (createdAfter) {
+      <mat-datepicker-toggle matIconSuffix (click)="createdAfter = undefined">
+        <mat-icon matDatepickerToggleIcon>close</mat-icon>
+      </mat-datepicker-toggle>
+    }
+    <mat-datepicker #pickerOne></mat-datepicker>
+  </mat-form-field>
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>Created before:</mat-label>
+    <input
+      [(ngModel)]="createdBefore"
+      matInput
+      [matDatepicker]="pickerTwo"
+      [matDatepickerFilter]="forceAfter"
+      placeholder="MM/DD/YYYY"
+    />
+    <mat-datepicker-toggle
+      matIconSuffix
+      [for]="pickerTwo"
+    ></mat-datepicker-toggle>
+    @if (createdBefore) {
+      <mat-datepicker-toggle matIconSuffix (click)="createdBefore = undefined">
+        <mat-icon matDatepickerToggleIcon>close</mat-icon>
+      </mat-datepicker-toggle>
+    }
+    <mat-datepicker #pickerTwo></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Account Types</mat-label>
+    <mat-select [(value)]="selectedAccountTypes" multiple>
+      @for (type of accountTypeOptions; track type) {
+        <mat-option [value]="type">{{ type }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-icon-button (click)="openUserCreate()" ><mat-icon>add</mat-icon></button>
+</fhss-table>

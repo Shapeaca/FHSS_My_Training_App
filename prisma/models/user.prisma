@@ -1,0 +1,38 @@
+enum ByuAccountType {
+  NonByu
+  Student
+  Employee
+  ServiceAccount
+}
+
+model User {
+  ///////////////////
+  // DO NOT MODIFY //
+  ///////////////////
+  // Object info
+  id                 String         @id @default(uuid())
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  // Site info
+  lastLogin          DateTime?
+  roles              String[]       @default([])
+  permissions        String[]       @default([])
+  canProxyUntil      DateTime?
+  // BYU info
+  accountType        ByuAccountType
+  netId              String         @unique
+  byuId              String?
+  workerId           String?
+  // Person info
+  firstName          String
+  middleName         String?
+  lastName           String
+  suffix             String?
+  preferredFirstName String
+  preferredLastName  String
+  ///////////////////
+  // DO NOT MODIFY //
+  ///////////////////
+
+  // Additional fields can be added here:
+}
