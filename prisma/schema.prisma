@@ -18,3 +18,25 @@ model JwtBlacklist {
 
   @@index([exp])
 }
+
+model Task {
+  id            String     @id @default(uuid())
+  createdDate   DateTime   @default(now())
+  updatedDate   DateTime?  @updatedAt
+  title         String
+  description   String?
+  dueDate       DateTime?
+  status        TaskStatus @default(INCOMPLETE)
+  completedDate DateTime?
+
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+}
+
+//Can we have a list of attributes as one attribute? or is that not allowed? 
+
+enum TaskStatus {
+  INCOMPLETE
+  COMPLETE
+  IN_PROGRESS
+}
