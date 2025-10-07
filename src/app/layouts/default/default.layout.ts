@@ -18,7 +18,11 @@ export class DefaultLayout {
     title: 'FHSS Starter App',
     menu: [
       { text: 'Home', path: '/' },
-      { text: 'Admin', path: '/admin' },
+      {
+        text: 'Admin',
+        path: '/admin',
+        requiredPermissions: ['manage-users-full-access'],
+      },
     ],
   };
 }

@@ -1,9 +1,9 @@
 import { makeDummy } from '@fhss-web-team/backend-utils';
 import z from 'zod/v4';
-import { Prisma, prisma } from '../../../../prisma/client';
-import { faker } from '@faker-js/faker';
+import { prisma } from '../../../../prisma/client';
+import { createTasksFromFaker } from '../../../../utils/task/task';
 
-export const createTasks = makeDummy({
+export const createTasksDummy = makeDummy({
   name: 'Create tasks',
   description: 'This Creates tasks',
   inputSchema: z.object({ count: z.number().default(10), netId: z.string() }),
@@ -15,16 +15,7 @@ export const createTasks = makeDummy({
       throw new Error('User not found');
     }
 
-    const tasks: Prisma.TaskCreateManyInput[] = Array.from(
-      { length: data.count },
-      () => ({
-        title: faker.book.title(),
-        description: faker.lorem.sentences({ min: 0, max: 3 }),
-        ownerId: user.id,
-      })
-    );
-
-    const { count } = await prisma.task.createMany({ data: tasks });
-    return `Created ${count} tasks`;
+    const { length } = await createTasksFromFaker(data.count, user.id);
+    return `Created ${length} tasks`;
   },
 });

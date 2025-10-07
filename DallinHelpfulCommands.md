@@ -19,3 +19,7 @@ npm run prisma:generate
 
 * Resets Local Databse
   npx prisma migrate reset
+
+# Sudo (super user do) (Run commands with highest permissions) - Just do this every once in a while
+
+sudo apt update && sudo apt upgrade -y
