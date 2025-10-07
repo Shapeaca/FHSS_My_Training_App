@@ -7,64 +7,72 @@ import { isPrismaError } from '../../../utils/prisma';
 
 const updateTaskInput = z.object({
   id: z.string(),
-  title: z.string(),
-  description: z.string().nullable(),
-  dueDate: z.date().nullable(),
-  status: z.literal(Object.values(TaskStatus)),
+  title: z.optional(z.string()),
+  description: z.optional(z.string()),
+  dueDate: z.optional(z.date()),
+  status: z.optional(z.literal(Object.values(TaskStatus))),
 });
 
-const updateTaskOutput = z.void();
+const updateTaskOutput = z.object({
+  status: z.literal(Object.values(TaskStatus)),
+  id: z.string(),
+  createdDate: z.date(),
+  updatedDate: z.date().nullable(),
+  title: z.string(),
+  description: z.string().nullable(),
+  completedDate: z.nullable(z.date()),
+  ownerId: z.string(),
+});
 
 export const updateTask = authorizedProcedure
   .meta({ requiredPermissions: ['manage-tasks'] })
   .input(updateTaskInput)
   .output(updateTaskOutput)
   .mutation(async opts => {
-    // Your logic goes here
-    try {
-      const foundTask = await prisma.task.findUniqueOrThrow({
-        where: {
-          id: opts.input.id,
-          ownerId: opts.ctx.userId,
-        },
+    const oldTask = await prisma.task.findUnique({
+      where: { id: opts.input.id, ownerId: opts.ctx.userId },
+    });
+    if (!oldTask) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
       });
+    }
 
-      //check if the same
-
-      //check if status is completed
-      let nwCompletedDate;
-      if (opts.input.status == foundTask.status) {
-        //stays the same
-        nwCompletedDate = foundTask.dueDate;
-      } else {
-        //changes
-        if (opts.input.status == TaskStatus.COMPLETE) {
-          //Changes to complete
-          nwCompletedDate = new Date(Date.now());
-        } else {
-          //Changes from complete to something else
-          nwCompletedDate = null;
+    //calculate completedAt date based on status changes
+    let calculatedCompletedAt: Date | null = oldTask.completedDate;
+    if (opts.input.status) {
+      if (opts.input.status != oldTask.status) {
+        //if we just switched the task to complete
+        if (opts.input.status === 'COMPLETE') {
+          calculatedCompletedAt = new Date();
+        }
+        //if we just switched the task off complete
+        else if (oldTask.status === 'COMPLETE') {
+          calculatedCompletedAt = null;
         }
       }
+    }
 
-      //finally updating
-      await prisma.task.update({
+    try {
+      return await prisma.task.update({
         where: {
-          id: opts.input.id,
+          id: oldTask.id,
+          ownerId: opts.ctx.userId,
         },
         data: {
-          title: opts.input.title,
+          title: opts.input.title?.trim(),
           description: opts.input.description,
-          dueDate: opts.input.dueDate,
           status: opts.input.status,
-          completedDate: nwCompletedDate,
+          completedDate: calculatedCompletedAt,
         },
       });
     } catch (error) {
       if (isPrismaError(error, 'NOT_FOUND')) {
-        throw new TRPCError({ code: 'NOT_FOUND' });
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `failed to update task: ${oldTask.id} under user: ${opts.ctx.user.netId}`,
+        });
       }
-
       throw error;
     }
   });
